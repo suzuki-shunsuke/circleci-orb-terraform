@@ -1,0 +1,86 @@
+---
+version: 2.1
+
+orbs:
+  orb-tools: circleci/orb-tools@9.0.1
+
+executors:
+  circleci:
+    docker:
+      - image: circleci/circleci-cli:0.1.6949-alpine
+
+workflows:
+  build:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+          
+      - publish-dev-of-pr:
+          requires:
+            - build
+            - test
+      - publish:
+          requires:
+            - build
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+
+jobs:
+  build:
+    executor: circleci
+    steps:
+      - checkout
+      - orb-tools/pack
+      - orb-tools/validate
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*"
+  test:
+    executor: circleci
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Validate config
+          command: |
+            apk add bash
+            bash scripts/validate.sh
+
+  publish:
+    executor: circleci
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Publish orb
+          command: |
+            # requirement: environment variable CIRCLECI_CLI_TOKEN
+            circleci orb publish orb.yml suzuki-shunsuke/terraform@${CIRCLE_TAG}
+  publish-dev-of-pr:
+    executor: circleci
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Publish orb dev version for pull request
+          command: |
+            if [ -n "${CIRCLE_PULL_REQUEST:-""}" ]; then
+              # requirement: environment variable CIRCLECI_CLI_TOKEN
+              circleci orb publish orb.yml suzuki-shunsuke/terraform@dev:pr-$(basename ${CIRCLE_PULL_REQUEST})
+            fi
+            if [ "${CIRCLE_BRANCH:-""}" = "master" ]; then
+              circleci orb publish orb.yml suzuki-shunsuke/terraform@dev:master
+            fi

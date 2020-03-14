@@ -1,0 +1,4 @@
+workflows:
+  build:
+    jobs:
+      - check_changed
