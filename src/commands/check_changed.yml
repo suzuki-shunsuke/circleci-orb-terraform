@@ -27,9 +27,21 @@ steps:
           COLOR_OFF="\e[m"
           echo -e "${COLOR_2}$*${COLOR_OFF}"
         }
+        echo_error() {
+          COLOR_1="\e[31;1m"
+          COLOR_OFF="\e[m"
+          echo -e "${COLOR_1}$*${COLOR_OFF}" >&2
+        }
 
         if [ -n "<< parameters.setup_dir >>" ]; then
           export PATH="<< parameters.setup_dir >>/bin:$PATH"
+        fi
+
+        if  [ ! -d << parameters.result_dir >> ]; then
+          echo_error "<< parameters.result_dir >> isn't found"
+          # requirement: github-comment
+          github-comment -template ":x: << parameters.result_dir >> isn't found"
+          exit 1
         fi
 
         if [ $(find << parameters.result_dir >> -name changed.txt | wc -l) -eq 0 ]; then
