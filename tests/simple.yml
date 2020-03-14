@@ -1,10 +1,4 @@
 workflows:
   build:
     jobs:
-      - build
-jobs:
-  build:
-    docker:
-      - image: plugins/git
-    steps:
-      - checkout
+      - check_changed
