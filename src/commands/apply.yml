@@ -4,6 +4,7 @@ description: |
   * bash
   * tfnotify
   * terraform
+  * github-comment
 parameters:
   apply_options:
     type: string
@@ -27,8 +28,22 @@ steps:
       # requirement: bash
       shell: /bin/bash -eu -o pipefail
       command: |
+        echo_error() {
+          COLOR_1="\e[31;1m"
+          COLOR_OFF="\e[m"
+          echo -e "${COLOR_1}$*${COLOR_OFF}" >&2
+        }
+
         root_dir=$PWD
         checkout_dir=$root_dir/<< parameters.checkout_dir >>
+
+        if  [ ! -d << parameters.result_dir >> ]; then
+          echo_error "<< parameters.result_dir >> isn't found"
+          # requirement: github-comment
+          github-comment -template ":x: << parameters.result_dir >> isn't found"
+          exit 1
+        fi
+
         for changed_file in $(find << parameters.result_dir >> -name changed.txt); do
           service_env_dir=$(dirname ${changed_file##<< parameters.result_dir >>})
           cd $checkout_dir/$service_env_dir
