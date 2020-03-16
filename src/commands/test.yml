@@ -8,7 +8,7 @@ parameters:
       In the directory, Terraform commands such as `terraform plan` are executed.
   result_dir:
     type: string
-    default: .ci/results
+    default: .orb-terraform/results
     description: |
       the relative path from the working directory to the directory where the result of `terraform plan` is written.
       Actually files are written in << parameters.result_dir >>/<< parameters.dir>>.
@@ -33,6 +33,14 @@ parameters:
       the relative path from the workspace root directory to tfnotify configuration file path.
       The path is set by `--config`. If this parameter is omitted, `--config` isn't set.
 steps:
+  - run:
+      name: tfenv install if needed
+      shell: /bin/bash -eu -o pipefail
+      command: |
+        cd << parameters.dir >>
+        if command -v tfenv > /dev/null 2>&1; then
+          tfenv install
+        fi
   - run:
       name: terraform init
       shell: /bin/bash -eu -o pipefail
