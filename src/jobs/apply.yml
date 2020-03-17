@@ -30,6 +30,10 @@ parameters:
           gomplate
           github-comment
         results/
+  no_output_timeout:
+    type: string
+    default: "30m"
+    description: Elapsed time the command can run without output.
 steps:
   - install_bash
   - setup_bash_env:
@@ -38,3 +42,4 @@ steps:
       apply_options: << parameters.apply_options >>
       checkout_dir: << parameters.checkout_dir >>
       result_dir: << parameters.orb_workspace >>/results
+      no_output_timeout: << parameters.no_output_timeout >>
