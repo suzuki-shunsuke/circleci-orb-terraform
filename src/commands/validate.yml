@@ -24,4 +24,3 @@ steps:
           exit 1
         fi
         rm $vlog
-
