@@ -22,11 +22,16 @@ parameters:
     default: .orb-terraform/results
     description: |
       The relative path from the working directory to the directory where the result of `test` command is written.
+  no_output_timeout:
+    type: string
+    default: "30m"
+    description: Elapsed time the command can run without output.
 steps:
-  - run:
+  - deploy:
       name: terraform apply
       # requirement: bash
       shell: /bin/bash -eu -o pipefail
+      no_output_timeout: << parameters.no_output_timeout >>
       command: |
         echo_error() {
           COLOR_1="\e[31;1m"
