@@ -2,85 +2,40 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@9.0.1
-
-executors:
-  circleci:
-    docker:
-      - image: circleci/circleci-cli:0.1.6949-alpine
+  orb: suzuki-shunsuke/orb@0.1.1
 
 workflows:
   build:
     jobs:
-      - build:
+      - orb/pack:
+          name: pack
           filters:
             tags:
               only: /.*/
-      - test:
+      - orb/test:
+          name: test
+          workflows: ls tests/*
           requires:
-            - build
+            - pack
           filters:
             tags:
               only: /.*/
           
-      - publish-dev-of-pr:
+      - orb/publish-dev:
+          name: publish-dev
+          orb_path: suzuki-shunsuke/terraform
           requires:
-            - build
+            - pack
             - test
-      - publish:
+
+      - orb/publish:
+          name: publish
+          orb_path: suzuki-shunsuke/terraform
           requires:
-            - build
+            - pack
             - test
           filters:
             tags:
               only: /.*/
             branches:
               ignore: /.*/
-
-jobs:
-  build:
-    executor: circleci
-    steps:
-      - checkout
-      - orb-tools/pack
-      - orb-tools/validate
-      - persist_to_workspace:
-          root: .
-          paths:
-            - "*"
-  test:
-    executor: circleci
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Validate config
-          command: |
-            apk add bash
-            bash scripts/validate.sh
-
-  publish:
-    executor: circleci
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Publish orb
-          command: |
-            # requirement: environment variable CIRCLECI_CLI_TOKEN
-            circleci orb publish orb.yml suzuki-shunsuke/terraform@${CIRCLE_TAG}
-  publish-dev-of-pr:
-    executor: circleci
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Publish orb dev version for pull request
-          command: |
-            if [ -n "${CIRCLE_PULL_REQUEST:-""}" ]; then
-              # requirement: environment variable CIRCLECI_CLI_TOKEN
-              circleci orb publish orb.yml suzuki-shunsuke/terraform@dev:pr-$(basename ${CIRCLE_PULL_REQUEST})
-            fi
-            if [ "${CIRCLE_BRANCH:-""}" = "master" ]; then
-              circleci orb publish orb.yml suzuki-shunsuke/terraform@dev:master
-            fi
