@@ -59,13 +59,13 @@ steps:
         chmod a+x $bin_dir/tfnotify
         rm -R $dirpath
   - run:
-      name: Install github-comment-cli
+      name: Install github-comment
       command: |
         bin_dir=$PWD/<< parameters.orb_workspace >>/bin
         dirpath=$(mktemp -d)
         cd $dirpath
         # requirement curl
-        curl -L https://github.com/suzuki-shunsuke/github-comment-cli/releases/download/v0.1.0-2/github-comment-cli_0.1.0-2_linux_amd64.tar.gz | tar xvzf - github-comment
+        curl -L https://github.com/suzuki-shunsuke/github-comment/releases/download/v0.1.0/github-comment_0.1.0_linux_amd64.tar.gz | tar xvzf - github-comment
         mv github-comment $bin_dir
         chmod a+x $bin_dir/github-comment
         rm -R $dirpath
