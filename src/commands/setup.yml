@@ -32,7 +32,7 @@ parameters:
       https://github.com/hairyhenderson/gomplate/releases/download/<< parameters.gomplate_version >>/gomplate_linux-amd64
   github_comment_version:
     type: string
-    default: 0.1.0
+    default: 0.2.0
     description: |
       The version of github-comment. github-comment is downloaded from the release page.
       Please remove the prefix "v".
