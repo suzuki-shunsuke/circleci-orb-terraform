@@ -77,6 +77,8 @@ steps:
           fi
         fi
   - steps: << parameters.checkout >>
+  - setup_bash_env:
+      orb_workspace: << parameters.orb_workspace >>
   - setup:
       custom_setup: << parameters.custom_setup >>
       tfnotify_version: << parameters.tfnotify_version >>
