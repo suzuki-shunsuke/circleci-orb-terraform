@@ -26,6 +26,12 @@ parameters:
     type: string
     default: "30m"
     description: Elapsed time the command can run without output.
+  tfnotify_config_path:
+    type: string
+    default: ""
+    description: |
+      the relative path from the workspace root directory to tfnotify configuration file path.
+      The path is set by `--config`. If this parameter is omitted, `--config` isn't set.
 steps:
   - deploy:
       name: terraform apply
@@ -45,8 +51,20 @@ steps:
         if  [ ! -d << parameters.result_dir >> ]; then
           echo_error "<< parameters.result_dir >> isn't found"
           # requirement: github-comment
-          github-comment post -template ":x: << parameters.result_dir >> isn't found"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.result_dir >> isn't found. Please check the parameters.result_dir"
           exit 1
+        fi
+
+        if  [ ! -d $checkout_dir ]; then
+          echo_error "the directory $checkout_dir isn't found"
+          # requirement: github-comment
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.checkout_dir >> isn't found. Please check parameters.checkout_dir"
+          exit 1
+        fi
+
+        tfnotify="tfnotify"
+        if [ -n "<< parameters.tfnotify_config_path >>" ]; then
+          tfnotify="tfnotify --config $root_dir/<< parameters.tfnotify_config_path >>"
         fi
 
         for changed_file in $(find << parameters.result_dir >> -name changed.txt); do
@@ -68,7 +86,7 @@ steps:
             title=":x: [$service_env_dir] terraform apply is failed"
           fi
           # requirement: tfnotify
-          cat $applyfile | tfnotify apply --title $title
+          cat $applyfile | $tfnotify apply --title $title
           if [ $code -ne 0 ]; then
             exit $code
           fi

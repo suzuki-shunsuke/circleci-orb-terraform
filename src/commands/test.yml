@@ -37,6 +37,12 @@ steps:
       name: tfenv install if needed
       shell: /bin/bash -eu -o pipefail
       command: |
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory << parameters.dir >> isn't found. Please check parameters.dir"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
+
         cd << parameters.dir >>
         if command -v tfenv > /dev/null 2>&1; then
           tfenv install
@@ -45,6 +51,12 @@ steps:
       name: terraform init
       shell: /bin/bash -eu -o pipefail
       command: |
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory << parameters.dir >> isn't found. Please check parameters.dir"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
+
         cd << parameters.dir >>
         terraform init
   - fmt:

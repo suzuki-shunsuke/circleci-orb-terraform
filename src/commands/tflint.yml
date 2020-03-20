@@ -42,6 +42,12 @@ steps:
           rm $tempfile
         }
 
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory $checkout_dir isn't found"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
+
         cd << parameters.dir >>
         filepath=$(mktemp)
         if ! tflint > $filepath 2>&1; then

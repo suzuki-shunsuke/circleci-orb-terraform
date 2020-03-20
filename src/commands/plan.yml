@@ -35,21 +35,28 @@ steps:
         if [ -n "<< parameters.tfnotify_config_path >>" ]; then
           tfnotify="tfnotify --config $root_dir/<< parameters.tfnotify_config_path >>"
         fi
-        cd << parameters.dir >>
 
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory $checkout_dir isn't found"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
+
+        cd "<< parameters.dir >>"
+
+        mkdir -p "$result_dir"
+        touch "$result_dir/dummy.txt"
         set +o errexit
-        terraform plan -detailed-exitcode << parameters.plan_options >> > /tmp/plan.txt
+        terraform plan -out "$result_dir/plan.out" -detailed-exitcode << parameters.plan_options >> > "$result_dir/plan.txt"
         code=$?
         set -e
 
-        mkdir -p $result_dir
-        touch $result_dir/dummy.txt
         if [ "$code" = "0" ]; then
           # no changed
-          cat /tmp/plan.txt
+          cat "$result_dir/plan.txt"
           exit 0
         fi
-        cat /tmp/plan.txt | $tfnotify plan --title "Plan << parameters.dir >>"
+        cat "$result_dir/plan.txt" | $tfnotify plan --title "Plan << parameters.dir >>"
         if [ "$code" = "2" ]; then
           # changed
           touch $result_dir/changed.txt

@@ -42,6 +42,12 @@ steps:
           COLOR_OFF="\e[m"
           echo -e "${COLOR_1}$*${COLOR_OFF}" >&2
         }
+
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory $checkout_dir isn't found"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
         
         cd << parameters.dir >>
         if ! terraform fmt -check > /dev/null 2>&1; then
