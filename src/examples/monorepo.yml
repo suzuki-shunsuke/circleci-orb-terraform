@@ -1,0 +1,83 @@
+description: |
+  Lint and test and apply Terraform configuration.
+  https://github.com/suzuki-shunsuke/example-circleci-orb-terraform
+usage:
+  version: 2.1
+  orbs:
+    terraform: suzuki-shunsuke/terraform@0.2.8
+  workflows:
+    build:
+      jobs:
+        - terraform/setup:
+            name: setup
+            custom_setup:
+              - terraform/install_tflint:
+                  install_dir: .orb-terraform/bin
+              - run:
+                  name: tfenv install
+                  shell: /bin/bash -eu -o pipefail
+                  command: |
+                    tfenv install
+
+        - terraform/test:
+            name: test foo/staging
+            requires:
+              - setup
+            dir: services/foo/staging
+            tfnotify_config_path: .tfnotify.yaml
+            custom_tests:
+              - terraform/tflint:
+                  dir: services/foo/staging
+
+        - terraform/test:
+            name: test foo/production
+            requires:
+              - setup
+            dir: services/foo/production
+            tfnotify_config_path: .tfnotify.yaml
+            custom_tests:
+              - terraform/tflint:
+                  dir: services/foo/production
+
+        - terraform/test:
+            name: test bar/staging
+            requires:
+              - setup
+            dir: services/bar/staging
+            tfnotify_config_path: .tfnotify.yaml
+            custom_tests:
+              - terraform/tflint:
+                  dir: services/bar/staging
+
+        - terraform/test:
+            name: test bar/production
+            requires:
+              - setup
+            dir: services/bar/production
+            tfnotify_config_path: .tfnotify.yaml
+            custom_tests:
+              - terraform/tflint:
+                  dir: services/bar/production
+
+        - terraform/check_changed:
+            name: Check changed states
+            requires:
+              - setup
+              - test foo/staging
+              - test foo/production
+              - test bar/staging
+              - test bar/production
+
+        - terraform/apply:
+            name: apply
+            tfnotify_config_path: .tfnotify.yaml
+            requires:
+              - setup
+              - test foo/staging
+              - test foo/production
+              - test bar/staging
+              - test bar/production
+            filters:
+              branches:
+                only:
+                  - master
