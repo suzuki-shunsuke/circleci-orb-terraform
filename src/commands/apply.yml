@@ -86,7 +86,7 @@ steps:
             title=":x: [$service_env_dir] terraform apply is failed"
           fi
           # requirement: tfnotify
-          cat $applyfile | $tfnotify apply --title $title
+          cat $applyfile | $tfnotify apply --title "$title"
           if [ $code -ne 0 ]; then
             exit $code
           fi
