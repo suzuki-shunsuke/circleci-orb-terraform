@@ -10,6 +10,12 @@ steps:
       name: terraform validate
       shell: /bin/bash -eu -o pipefail
       command: |
+        if [ ! -d "<< parameters.dir >>" ]; then
+          echo_error "the directory << parameters.dir >> isn't found. Please check parameters.dir"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
+          exit 1
+        fi
+
         cd << parameters.dir >>
         vlog=$(mktemp)
         if ! terraform validate -no-color > $vlog 2>&1; then

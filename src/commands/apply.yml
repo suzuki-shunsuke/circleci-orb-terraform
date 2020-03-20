@@ -51,7 +51,14 @@ steps:
         if  [ ! -d << parameters.result_dir >> ]; then
           echo_error "<< parameters.result_dir >> isn't found"
           # requirement: github-comment
-          github-comment post -template ":x: << parameters.result_dir >> isn't found"
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.result_dir >> isn't found. Please check the parameters.result_dir"
+          exit 1
+        fi
+
+        if  [ ! -d $checkout_dir ]; then
+          echo_error "the directory $checkout_dir isn't found"
+          # requirement: github-comment
+          github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.checkout_dir >> isn't found. Please check parameters.checkout_dir"
           exit 1
         fi
 
