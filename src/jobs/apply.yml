@@ -42,6 +42,15 @@ parameters:
       The path is set by `--config`. If this parameter is omitted, `--config` isn't set.
 steps:
   - install_bash
+  - run:
+      name: Install requirements on Alpine
+      command: |
+        if command -v apk; then
+          apk add ca-certificates
+        fi
+  # requirement: ca-certificates
+  - attach_workspace:
+      at: .
   - setup_bash_env:
       orb_workspace: << parameters.orb_workspace >>
   - apply:
