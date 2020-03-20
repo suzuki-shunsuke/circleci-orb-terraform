@@ -18,7 +18,7 @@ steps:
               HEADER=":x: [Job Link]($CIRCLE_BUILD_URL) [<< parameters.dir >>] terraform validate is failure" \
               COMMAND="terraform validate" \
               OUTPUT=$(cat $vlog) \
-              gomplate | github-comment
+              gomplate | github-comment post
           fi
           rm $vlog
           exit 1

@@ -50,7 +50,7 @@ steps:
             HEADER=":x: [Job Link]($CIRCLE_BUILD_URL) [<< parameters.dir >>] tflint is failure" \
             COMMAND="tflint" \
             OUTPUT=$(cat $filepath) \
-            gomplate | github-comment
+            gomplate | github-comment post
           rm $filepath
           exit 1
         fi

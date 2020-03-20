@@ -52,7 +52,7 @@ steps:
               HEADER=":x: [Job Link]($CIRCLE_BUILD_URL) [<< parameters.dir >>] Please run 'terraform fmt'" \
               COMMAND="terraform fmt -diff -write=false" \
               OUTPUT=$(terraform fmt -diff -write=false -no-color) \
-              gomplate | github-comment
+              gomplate | github-comment post
           fi
           exit 1
         fi
