@@ -10,7 +10,6 @@ parameters:
         .tfenv
         bin/
           tfnotify
-          gomplate
           github-comment
         results/
 steps:
@@ -30,17 +29,17 @@ steps:
         }
         echo_command_result_template() {
           local tempfile; tempfile=$(mktemp)
-          echo "{{ .Env.HEADER }}" > $tempfile
+          echo '{{Env "HEADER" }}' > $tempfile
           echo "" >> $tempfile
           echo "\`\`\`" >> $tempfile
-          echo "$ {{ .Env.COMMAND }}" >> $tempfile
+          echo '$ {{Env "COMMAND" }}' >> $tempfile
           echo "\`\`\`" >> $tempfile
           echo "" >> $tempfile
           echo "<details>" >> $tempfile
           echo "<summary>Command Output</summary>" >> $tempfile
           echo "" >> $tempfile
           echo "\`\`\`" >> $tempfile
-          echo "{{ .Env.OUTPUT }}" >> $tempfile
+          echo '{{Env "OUTPUT" }}' >> $tempfile
           echo "\`\`\`" >> $tempfile
           echo "" >> $tempfile
           echo "</details>" >> $tempfile

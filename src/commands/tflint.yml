@@ -24,17 +24,17 @@ steps:
         }
         echo_command_result_template() {
           local tempfile; tempfile=$(mktemp)
-          echo "{{ .Env.HEADER }}" > $tempfile
+          echo '{{Env "HEADER" }}' > $tempfile
           echo "" >> $tempfile
           echo "\`\`\`" >> $tempfile
-          echo "$ {{ .Env.COMMAND }}" >> $tempfile
+          echo '$ {{Env "COMMAND" }}' >> $tempfile
           echo "\`\`\`" >> $tempfile
           echo "" >> $tempfile
           echo "<details>" >> $tempfile
           echo "<summary>Command Output</summary>" >> $tempfile
           echo "" >> $tempfile
           echo "\`\`\`" >> $tempfile
-          echo "{{ .Env.OUTPUT }}" >> $tempfile
+          echo '{{Env "OUTPUT" }}' >> $tempfile
           echo "\`\`\`" >> $tempfile
           echo "" >> $tempfile
           echo "</details>" >> $tempfile
@@ -56,7 +56,7 @@ steps:
             HEADER=":x: [Job Link]($CIRCLE_BUILD_URL) [<< parameters.dir >>] tflint is failure" \
             COMMAND="tflint" \
             OUTPUT=$(cat $filepath) \
-            gomplate | github-comment post
+            github-comment post
           rm $filepath
           exit 1
         fi
