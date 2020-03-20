@@ -55,9 +55,9 @@ steps:
   - run:
       name: Install requirements on Alpine
       command: |
-        if command -v apk; then
+        if command -v apk > /dev/null 2>&1; then
           pkgs="ca-certificates"
-          if ! command -v curl; then
+          if ! command -v curl > /dev/null 2>&1; then
             pkgs="curl $pkgs"
           fi
           apk add $pkgs
