@@ -18,7 +18,7 @@ parameters:
     type: executor
     default: alpine
     description: |
-      Custom executor. The executor must use an Alpine based Docker image.
+      Custom executor.
   plan_options:
     type: string
     default: ""
