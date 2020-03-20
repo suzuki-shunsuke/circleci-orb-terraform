@@ -45,7 +45,6 @@ parameters:
         .tfenv
         bin/
           tfnotify
-          gomplate
           github-comment
         results/
 steps:

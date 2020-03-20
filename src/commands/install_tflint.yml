@@ -5,7 +5,7 @@ parameters:
     type: string
     default: bin
     description: |
-      The relative path from the workspace root directory to the directory where tflint are installed.
+      The relative path from the workspace root directory to the directory where tflint is installed.
   version:
     type: string
     default: v0.15.1

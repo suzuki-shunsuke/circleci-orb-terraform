@@ -1,5 +1,5 @@
 description: |
-  Install some tools such as tfnotify and gomplate.
+  Install some tools such as tfnotify github-comment.
 parameters:
   orb_workspace:
     type: string
@@ -10,7 +10,6 @@ parameters:
         .tfenv
         bin/
           tfnotify
-          gomplate
           github-comment
         results/
   custom_setup:
@@ -24,12 +23,6 @@ parameters:
     description: |
       The version of tfnotify. tfnotify is downloaded from the release page.
       https://github.com/mercari/tfnotify/releases/download/<< parameters.tfnotify_version >>/tfnotify_linux_amd64.tar.gz
-  gomplate_version:
-    type: string
-    default: v3.6.0
-    description: |
-      The version of gomplate. gomplate is downloaded from the release page.
-      https://github.com/hairyhenderson/gomplate/releases/download/<< parameters.gomplate_version >>/gomplate_linux-amd64
   github_comment_version:
     type: string
     default: 0.2.0
@@ -76,10 +69,4 @@ steps:
         mv github-comment $bin_dir
         chmod a+x $bin_dir/github-comment
         rm -R $dirpath
-  - run:
-      name: Install gomplate
-      command: |
-        gomplate_path=<< parameters.orb_workspace >>/bin/gomplate
-        curl -o $gomplate_path -sSL https://github.com/hairyhenderson/gomplate/releases/download/<< parameters.gomplate_version >>/gomplate_linux-amd64
-        chmod a+x $gomplate_path
   - steps: << parameters.custom_setup >>

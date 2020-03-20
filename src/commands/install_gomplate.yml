@@ -1,0 +1,26 @@
+description: |
+  Install gomplate
+parameters:
+  install_dir:
+    type: string
+    default: bin
+    description: |
+      The relative path from the workspace root directory to the directory where gomplate is installed.
+  version:
+    type: string
+    default: v3.6.0
+    description: |
+      The version of gomplate. gomplate is downloaded from the release page.
+      https://github.com/hairyhenderson/gomplate/releases/download/<< parameters.gomplate_version >>/gomplate_linux-amd64
+steps:
+  - run:
+      name: Install gomplate
+      command: |
+        bin_dir=$PWD/<< parameters.install_dir >>
+        if [ ! -d "$bin_dir" ]; then
+          mkdir -p "$bin_dir"
+        fi
+
+        gomplate_path=$bin_dir/gomplate
+        curl -o "$gomplate_path" -sSL "https://github.com/hairyhenderson/gomplate/releases/download/<< parameters.version >>/gomplate_linux-amd64"
+        chmod a+x "$gomplate_path"

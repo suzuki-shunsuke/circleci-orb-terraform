@@ -10,6 +10,31 @@ steps:
       name: terraform validate
       shell: /bin/bash -eu -o pipefail
       command: |
+        echo_command_result_template() {
+          local tempfile; tempfile=$(mktemp)
+          echo '{{Env "HEADER" }}' > $tempfile
+          echo "" >> $tempfile
+          echo "\`\`\`" >> $tempfile
+          echo '$ {{Env "COMMAND" }}' >> $tempfile
+          echo "\`\`\`" >> $tempfile
+          echo "" >> $tempfile
+          echo "<details>" >> $tempfile
+          echo "<summary>Command Output</summary>" >> $tempfile
+          echo "" >> $tempfile
+          echo "\`\`\`" >> $tempfile
+          echo '{{Env "OUTPUT" }}' >> $tempfile
+          echo "\`\`\`" >> $tempfile
+          echo "" >> $tempfile
+          echo "</details>" >> $tempfile
+          cat $tempfile
+          rm $tempfile
+        }
+        echo_error() {
+          COLOR_1="\e[31;1m"
+          COLOR_OFF="\e[m"
+          echo -e "${COLOR_1}$*${COLOR_OFF}" >&2
+        }
+
         if [ ! -d "<< parameters.dir >>" ]; then
           echo_error "the directory << parameters.dir >> isn't found. Please check parameters.dir"
           github-comment post -template ":x: [Job Link]($CIRCLE_BUILD_URL) << parameters.dir >> isn't found. Please check parameters.dir"
@@ -23,10 +48,10 @@ steps:
             echo_command_result_template |
               HEADER=":x: [Job Link]($CIRCLE_BUILD_URL) [<< parameters.dir >>] terraform validate is failure" \
               COMMAND="terraform validate" \
-              OUTPUT=$(cat $vlog) \
-              gomplate | github-comment post
+              OUTPUT="$(cat $vlog)" \
+              github-comment post
           fi
-          rm $vlog
+          rm "$vlog"
           exit 1
         fi
         rm $vlog
