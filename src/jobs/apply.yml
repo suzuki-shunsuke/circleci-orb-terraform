@@ -34,6 +34,12 @@ parameters:
     type: string
     default: "30m"
     description: Elapsed time the command can run without output.
+  tfnotify_config_path:
+    type: string
+    default: ""
+    description: |
+      the relative path from the workspace root directory to tfnotify configuration file path.
+      The path is set by `--config`. If this parameter is omitted, `--config` isn't set.
 steps:
   - install_bash
   - setup_bash_env:
@@ -43,3 +49,4 @@ steps:
       checkout_dir: << parameters.checkout_dir >>
       result_dir: << parameters.orb_workspace >>/results
       no_output_timeout: << parameters.no_output_timeout >>
+      tfnotify_config_path: << parameters.tfnotify_config_path >>

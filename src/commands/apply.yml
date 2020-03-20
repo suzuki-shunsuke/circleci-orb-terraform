@@ -26,6 +26,12 @@ parameters:
     type: string
     default: "30m"
     description: Elapsed time the command can run without output.
+  tfnotify_config_path:
+    type: string
+    default: ""
+    description: |
+      the relative path from the workspace root directory to tfnotify configuration file path.
+      The path is set by `--config`. If this parameter is omitted, `--config` isn't set.
 steps:
   - deploy:
       name: terraform apply
@@ -49,6 +55,11 @@ steps:
           exit 1
         fi
 
+        tfnotify="tfnotify"
+        if [ -n "<< parameters.tfnotify_config_path >>" ]; then
+          tfnotify="tfnotify --config $root_dir/<< parameters.tfnotify_config_path >>"
+        fi
+
         for changed_file in $(find << parameters.result_dir >> -name changed.txt); do
           service_env_dir=$(dirname ${changed_file##<< parameters.result_dir >>})
           cd $checkout_dir/$service_env_dir
@@ -68,7 +79,7 @@ steps:
             title=":x: [$service_env_dir] terraform apply is failed"
           fi
           # requirement: tfnotify
-          cat $applyfile | tfnotify apply --title $title
+          cat $applyfile | $tfnotify apply --title $title
           if [ $code -ne 0 ]; then
             exit $code
           fi
